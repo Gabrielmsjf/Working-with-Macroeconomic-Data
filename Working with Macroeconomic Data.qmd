@@ -9,6 +9,7 @@ Quarto enables you to weave together content and executable code into a finished
 ```{r}
 library(tidyverse)
 library(magrittr)
+library(plotly)
 
 
 ### Getting macroeconomic data
@@ -49,7 +50,20 @@ Bus_Conf_Exp$valor %<>%
   gsub(pattern = ",", replacement = ".", fixed = TRUE) %>% 
     as.numeric()
 
+Buss_Conf <- merge(Bus_Conf_Act, Bus_Conf_Exp, by = "data")
+colnames(Buss_Conf) <- c("Date", "Conf_Act", "Conf_Exp" )
+##### 
+
+econ <- merge(GDP, Buss_Conf, by.x = "data", by.y = "Date")
+
+colnames(econ) <- c("Date", "GDP", "GDP_Gowth", "Conf_Act", "Conf_Exp")
 
 
-
+plot_ly(x = econ$Date, y = econ$Conf_Act, type = "scatter", mode = "Lines")  
+  
+plot_ly(x = econ$Date, y = econ$GDP_Gowth, type = "bar") %>% 
+  add_trace(x = econ$Date, y = econ$Conf_Act, 
+            type = "scatter", mode = "lines", yaxis = "y2") %>% 
+  layout(yaxis2 = list(overlaying = "y",
+              side = "right"))
 ```
