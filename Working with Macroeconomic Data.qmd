@@ -2,10 +2,54 @@
 title: "Working with Macroeconomic Data"
 ---
 
-## Quarto
+## Working with Macroeconomic Data
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
 ```{r}
-1 + 1
+library(tidyverse)
+library(magrittr)
+
+
+### Getting macroeconomic data
+## Getting data from Brazilian central Bank API
+
+GDP = read.csv('http://api.bcb.gov.br/dados/serie/bcdata.sgs.22099/dados?formato=csv', sep = ";")
+
+
+### Cleaning data
+GDP$data %<>% 
+    as.Date(format = "%d/%m/%Y")
+
+GDP$valor %<>% 
+  gsub(pattern = ",", replacement = ".", fixed = TRUE) %>% 
+    as.numeric()
+
+GDP$n_Growth <- (GDP$valor - lag(GDP$valor))/ lag(GDP$valor) 
+
+######################################################################
+### Business Confidence index - actual conditions
+Bus_Conf_Act <- read.csv('http://api.bcb.gov.br/dados/serie/bcdata.sgs.7342/dados?formato=csv', sep = ";")
+
+Bus_Conf_Act$data %<>% 
+    as.Date(format = "%d/%m/%Y")
+
+Bus_Conf_Act$valor %<>% 
+  gsub(pattern = ",", replacement = ".", fixed = TRUE) %>% 
+    as.numeric()
+
+
+### Business Confidence index - Expectations
+Bus_Conf_Exp <- read.csv('http://api.bcb.gov.br/dados/serie/bcdata.sgs.7343/dados?formato=csv', sep = ";")
+
+Bus_Conf_Exp$data %<>% 
+    as.Date(format = "%d/%m/%Y")
+
+Bus_Conf_Exp$valor %<>% 
+  gsub(pattern = ",", replacement = ".", fixed = TRUE) %>% 
+    as.numeric()
+
+
+
+
 ```
